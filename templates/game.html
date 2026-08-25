@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Ranking Game</title>
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  </head>
+  <body class="game-page">
+    <main class="page-shell narrow-shell">
+      <section id="ranking" class="card">
+        <p class="eyebrow">Host ranking</p>
+        <h1>Who would survive longest in prison?</h1>
+        <ul id="rankList" class="ranking-list">
+          {% for p in players %}
+          <li>{{ p }}</li>
+          {% endfor %}
+        </ul>
+        <button id="submitRanking" type="button">Submit ranking</button>
+      </section>
+
+      <section id="guess" class="card hidden">
+        <p class="eyebrow">Final guess</p>
+        <h2>Guess the question</h2>
+        <h3>Ranking</h3>
+        <ol id="rankingDisplay" class="ranking-display"></ol>
+
+        <label>
+          <span>Choose the correct prompt</span>
+          <select id="guessSelect">
+            {% for q in questions %}
+            <option>{{ q }}</option>
+            {% endfor %}
+          </select>
+        </label>
+
+        <button id="submitGuess" type="button">Submit guess</button>
+      </section>
+
+      <section id="results" class="card hidden">
+        <p class="eyebrow">Results</p>
+        <h2>Score: <span id="score">0</span></h2>
+      </section>
+    </main>
+
+    <script src="{{ url_for('static', filename='game.js') }}"></script>
+  </body>
+</html>

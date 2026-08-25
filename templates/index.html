@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Ranking Game</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  </head>
+  <body class="landing-page">
+    <main class="page-shell">
+      <section class="hero-card">
+        <p class="eyebrow">Party game</p>
+        <h1>Ranking Game</h1>
+        <p class="subtitle">Create a room, invite your friends, and vote on wild social questions.</p>
+      </section>
+
+      <section class="panel-grid">
+        <form class="panel" method="post" action="/create">
+          <h2>Create room</h2>
+          <label>
+            <span>Your name</span>
+            <input name="name" placeholder="Enter your name" required>
+          </label>
+          <button type="submit">Create lobby</button>
+        </form>
+
+        <form class="panel" method="post" action="/join">
+          <h2>Join room</h2>
+          <label>
+            <span>Your name</span>
+            <input name="name" placeholder="Enter your name" required>
+          </label>
+          <label>
+            <span>Room code</span>
+            <input name="code" placeholder="ABCDE" maxlength="5" required>
+          </label>
+          <button type="submit">Join game</button>
+        </form>
+      </section>
+    </main>
+  </body>
+</html>

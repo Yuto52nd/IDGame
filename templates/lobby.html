@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Game Lobby</title>
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  </head>
+  <body class="lobby-page" data-room="{{ room }}" data-name="{{ name }}">
+    <main class="page-shell narrow-shell">
+      <section id="lobbyScreen" class="card screen active-screen">
+        <div class="room-header">
+          <div>
+            <p class="eyebrow">Lobby</p>
+            <h1>Room {{ room }}</h1>
+          </div>
+          <span class="room-code">{{ room }}</span>
+        </div>
+
+        <ul id="players" class="player-list"></ul>
+
+        <div class="action-row">
+          <button id="ready" class="secondary" type="button">Toggle Ready</button>
+          <button id="start" class="hidden" type="button">Start Game</button>
+        </div>
+      </section>
+
+      <section id="gameScreen" class="card screen">
+        <div class="room-header compact-header">
+          <div>
+            <p class="eyebrow">Round</p>
+            <h2><span id="round">1</span></h2>
+          </div>
+        </div>
+
+        <div id="hostView" class="hidden">
+          <h3 id="question"></h3>
+          <p class="helper-copy">Drag and drop the players into your final ranking.</p>
+          <ul id="rankPlayers" class="ranking-list"></ul>
+          <button id="submitRankingBtn" type="button">Submit ranking</button>
+        </div>
+
+        <div id="playerView" class="hidden">
+          <h3>Round starting...</h3>
+          <p class="helper-copy">The host is ranking everyone. Stay ready.</p>
+          <ol id="playerRankingDisplay" class="ranking-display"></ol>
+
+          <div id="questionList" class="question-list"></div>
+          <button id="submitGuessBtn" type="button">Submit guess</button>
+        </div>
+
+        <div id="resultView" class="hidden">
+          <p class="eyebrow">Results</p>
+          <h3 id="resultTitle">Round result</h3>
+          <p id="resultMessage"></p>
+          <div id="scoreboard" class="scoreboard"></div>
+          <button id="nextRoundBtn" class="hidden" type="button">Next round</button>
+        </div>
+      </section>
+    </main>
+
+    <script src="{{ url_for('static', filename='lobby.js') }}"></script>
+  </body>
+</html>
