@@ -26,17 +26,41 @@ const nextRoundBtn = document.getElementById('nextRoundBtn');
 let selectedGuess = null;
 let currentHost = null;
 let currentRanker = null;
+let rankingLocked = false;
+let guessLocked = false;
+let sortableInstance = null;
 
 socket.emit('join_room', { room, name: me });
 
 readyButton.addEventListener('click', () => socket.emit('toggle_ready'));
 startButton.addEventListener('click', () => socket.emit('start_game'));
 submitRankingBtn.addEventListener('click', () => {
+  if (rankingLocked) return;
+
   const ranking = [...rankPlayers.children].map((li) => li.dataset.name);
+  if (!ranking.length) return;
+
+  rankingLocked = true;
+  submitRankingBtn.disabled = true;
+  submitRankingBtn.textContent = 'Ranking submitted';
+  rankPlayers.classList.add('hidden');
+
+  const helper = hostView.querySelector('.helper-copy');
+  if (helper) {
+    helper.textContent = 'Waiting for players to pick their question...';
+  }
+
+  if (sortableInstance) {
+    sortableInstance.option('disabled', true);
+  }
+
   socket.emit('submit_ranking', { ranking });
 });
 submitGuessBtn.addEventListener('click', () => {
-  if (!selectedGuess) return;
+  if (!selectedGuess || guessLocked) return;
+
+  guessLocked = true;
+  questionList.classList.add('hidden');
   socket.emit('submit_guess', { guess: selectedGuess });
   submitGuessBtn.disabled = true;
   submitGuessBtn.textContent = 'Guess submitted';
@@ -129,6 +153,20 @@ socket.on('game_started', (data) => {
 });
 
 socket.on('host_question', (data) => {
+  rankingLocked = false;
+  guessLocked = false;
+  selectedGuess = null;
+  questionList.classList.remove('hidden');
+  questionList.innerHTML = '';
+  submitRankingBtn.disabled = false;
+  submitRankingBtn.textContent = 'Submit ranking';
+  rankPlayers.classList.remove('hidden');
+
+  const helper = hostView.querySelector('.helper-copy');
+  if (helper) {
+    helper.textContent = 'Drag and drop the players into your final ranking.';
+  }
+
   questionEl.textContent = data.question;
   rankPlayers.innerHTML = '';
 
@@ -143,7 +181,10 @@ socket.on('host_question', (data) => {
   });
 
   if (window.Sortable && rankPlayers) {
-    new Sortable(rankPlayers, {
+    if (sortableInstance) {
+      sortableInstance.destroy();
+    }
+    sortableInstance = new Sortable(rankPlayers, {
       animation: 150,
       ghostClass: 'sortable-ghost',
       dragClass: 'sortable-drag'
@@ -166,6 +207,8 @@ socket.on('ranking_submitted', (data) => {
   });
 
   selectedGuess = null;
+  guessLocked = false;
+  questionList.classList.remove('hidden');
   renderQuestionChoices(data.question_options || []);
 
   hostView.classList.add('hidden');
@@ -197,22 +240,27 @@ socket.on('round_result', (data) => {
 socket.on('next_round_started', (data) => {
   currentHost = data.host;
   currentRanker = data.ranker;
+  rankingLocked = false;
+  guessLocked = false;
+  selectedGuess = null;
   roundEl.textContent = data.round;
   lobbyScreen.classList.remove('active-screen');
   lobbyScreen.classList.add('hidden');
   gameScreen.classList.remove('hidden');
   gameScreen.classList.add('active-screen');
   resultView.classList.add('hidden');
+  questionList.classList.remove('hidden');
 
   if (me === data.ranker) {
     hostView.classList.remove('hidden');
     playerView.classList.add('hidden');
+    submitRankingBtn.disabled = false;
+    submitRankingBtn.textContent = 'Submit ranking';
   } else {
     hostView.classList.add('hidden');
     playerView.classList.remove('hidden');
     playerRankingDisplay.innerHTML = '';
     questionList.innerHTML = '';
-    selectedGuess = null;
     submitGuessBtn.disabled = false;
     submitGuessBtn.textContent = 'Submit guess';
   }
