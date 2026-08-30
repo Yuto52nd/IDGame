@@ -10,7 +10,12 @@ const submitRankingButton = document.getElementById('submitRanking');
 const submitGuessButton = document.getElementById('submitGuess');
 
 if (rankList) {
-  new Sortable(rankList, { animation: 150 });
+  new Sortable(rankList, {
+    animation: 150,
+    delay: 180,
+    delayOnTouchOnly: true,
+    touchStartThreshold: 8
+  });
 }
 
 if (guessSelect) {

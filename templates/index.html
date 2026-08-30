@@ -21,6 +21,17 @@
             <span>Your name</span>
             <input name="name" placeholder="Enter your name" required>
           </label>
+          <fieldset class="pack-fieldset">
+            <legend>Question packs</legend>
+            <div class="pack-list">
+              {% for key, bank in question_banks.items() %}
+              <label class="pack-option">
+                <input class="pack-toggle" type="checkbox" name="question_banks" value="{{ key }}" checked>
+                <span>{{ bank.label }}</span>
+              </label>
+              {% endfor %}
+            </div>
+          </fieldset>
           <button type="submit">Create lobby</button>
         </form>
 

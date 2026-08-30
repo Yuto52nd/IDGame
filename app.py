@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, session
 from flask_socketio import SocketIO, join_room
+from question_store import get_question_banks, get_questions, get_questions_from_banks
 import random
 import string
 
@@ -7,29 +8,8 @@ app = Flask(__name__)
 app.config["SECRET_KEY"] = "change-me"
 socketio = SocketIO(app)
 
-QUESTIONS = [
-    "Who would survive longest in prison?",
-    "Who would be the best spy?",
-    "Who would survive a zombie apocalypse?",
-    "Who would become famous first?",
-    "Who would crack under pressure first?",
-    "Who would be the best liar?",
-    "Who would make the worst road trip partner?",
-    "Who would win a cooking contest?",
-    "Who would get arrested first?",
-    "Who would survive a desert island?",
-    "Who would be most likely to start a cult?",
-    "Who would be the best captain?",
-    "Who would become a millionaire fastest?",
-    "Who would be the funniest in a crisis?",
-    "Who would most likely get lost in their own city?",
-    "Who would absolutely win hide and seek?",
-    "Who would be the best criminal mastermind?",
-    "Who would ruin a party fastest?",
-    "Who would win an argument with a police officer?",
-    "Who would be the scariest in a horror movie?",
-    "Who would survive a week without their phone?"
-]
+QUESTION_BANKS = get_question_banks()
+QUESTIONS = get_questions("classic")
 
 AVATARS = ["🦊", "🐼", "🐸", "🦁", "🐵", "🦄", "🐯", "🦉", "🐲", "🐻", "🐧", "🐺"]
 
@@ -77,15 +57,20 @@ def broadcast(room):
 
 @app.route("/")
 def index():
-    return render_template("index.html")
+    return render_template("index.html", question_banks=QUESTION_BANKS)
 
 
 @app.post("/create")
 def create():
     name = request.form["name"]
+    question_banks = request.form.getlist("question_banks") or ["classic"]
+    question_banks = [b for b in question_banks if b in QUESTION_BANKS]
+    if not question_banks:
+        question_banks = ["classic"]
     c = code()
     rooms[c] = {
         "host": name,
+        "question_banks": question_banks,
         "state": "lobby",
         "round": 1,
         "question": None,
@@ -149,7 +134,8 @@ def start():
         return
 
     r["state"] = "ranking"
-    r["question"] = random.choice(QUESTIONS)
+    question_pool = get_questions_from_banks(r["question_banks"])
+    r["question"] = random.choice(question_pool)
     r["ranking"] = []
     if r["round"] == 1:
         r["ranker"] = r["host"]
@@ -185,7 +171,8 @@ def submit_ranking(data):
 
     r["ranking"] = ranking
     r["state"] = "guessing"
-    options = build_question_options(QUESTIONS, r["question"])
+    question_pool = get_questions_from_banks(r["question_banks"])
+    options = build_question_options(question_pool, r["question"])
     socketio.emit("ranking_submitted", {
         "host": r["host"],
         "ranking": ranking,
@@ -242,7 +229,8 @@ def next_round():
 
     r["round"] += 1
     r["state"] = "ranking"
-    r["question"] = random.choice(QUESTIONS)
+    question_pool = get_questions_from_banks(r["question_banks"])
+    r["question"] = random.choice(question_pool)
     r["ranking"] = []
     r["guesses"] = {}
     r["current_result"] = None
