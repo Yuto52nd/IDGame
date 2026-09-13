@@ -21,17 +21,32 @@
             <span>Your name</span>
             <input name="name" placeholder="Enter your name" required>
           </label>
-          <fieldset class="pack-fieldset">
-            <legend>Question packs</legend>
-            <div class="pack-list">
-              {% for key, bank in question_banks.items() %}
-              <label class="pack-option">
-                <input class="pack-toggle" type="checkbox" name="question_banks" value="{{ key }}" checked>
-                <span>{{ bank.label }}</span>
-              </label>
-              {% endfor %}
+          <details class="pack-picker">
+            <summary>
+              <span class="pack-picker-title">Question mix</span>
+              <span class="pack-picker-summary" data-pack-summary>Classic</span>
+            </summary>
+            <div class="pack-picker-body">
+              <div class="pack-picker-header">
+                <p class="helper-copy">Choose one or more banks for this room.</p>
+                <div class="pack-actions" aria-label="Question bank selection actions">
+                  <button type="button" class="text-button" data-pack-action="all">All</button>
+                  <button type="button" class="text-button" data-pack-action="clear">Clear</button>
+                </div>
+              </div>
+              <fieldset class="pack-fieldset">
+                <legend class="sr-only">Question banks</legend>
+                <div class="pack-list">
+                  {% for key, bank in question_banks.items() %}
+                  <label class="pack-option">
+                    <input class="pack-toggle" type="checkbox" name="question_banks" value="{{ key }}"{% if key == 'classic' %} checked{% endif %}>
+                    <span>{{ bank.label }}</span>
+                  </label>
+                  {% endfor %}
+                </div>
+              </fieldset>
             </div>
-          </fieldset>
+          </details>
           <button type="submit">Create lobby</button>
         </form>
 
@@ -49,5 +64,6 @@
         </form>
       </section>
     </main>
+    <script src="{{ url_for('static', filename='home.js') }}"></script>
   </body>
 </html>

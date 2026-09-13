@@ -191,6 +191,10 @@ def submit_guess(data):
     if guess is None:
         return
 
+    question_pool = get_questions_from_banks(r["question_banks"])
+    if guess not in question_pool:
+        return
+
     if name in r["guesses"]:
         return
 

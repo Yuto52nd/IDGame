@@ -54,12 +54,17 @@ submitRankingBtn.addEventListener('click', () => {
     sortableInstance.option('disabled', true);
   }
 
+  rankPlayers.setAttribute('aria-disabled', 'true');
+
   socket.emit('submit_ranking', { ranking });
 });
 submitGuessBtn.addEventListener('click', () => {
   if (!selectedGuess || guessLocked) return;
 
   guessLocked = true;
+  questionList.querySelectorAll('.question-option').forEach((button) => {
+    button.disabled = true;
+  });
   questionList.classList.add('hidden');
   socket.emit('submit_guess', { guess: selectedGuess });
   submitGuessBtn.disabled = true;
@@ -169,6 +174,7 @@ socket.on('host_question', (data) => {
 
   questionEl.textContent = data.question;
   rankPlayers.innerHTML = '';
+  rankPlayers.removeAttribute('aria-disabled');
 
   data.players.forEach((player) => {
     const item = document.createElement('li');
@@ -209,6 +215,7 @@ socket.on('ranking_submitted', (data) => {
   selectedGuess = null;
   guessLocked = false;
   questionList.classList.remove('hidden');
+  questionList.removeAttribute('aria-disabled');
   renderQuestionChoices(data.question_options || []);
 
   hostView.classList.add('hidden');

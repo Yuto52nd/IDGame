@@ -33,6 +33,7 @@ def initialize_question_db():
             bank_id = connection.execute(
                 "SELECT id FROM question_banks WHERE bank_key = ?", (bank["key"],)
             ).fetchone()["id"]
+            connection.execute("DELETE FROM questions WHERE bank_id = ?", (bank_id,))
             connection.executemany(
                 "INSERT OR IGNORE INTO questions (bank_id, question) VALUES (?, ?)",
                 [(bank_id, question) for question in bank["questions"]],

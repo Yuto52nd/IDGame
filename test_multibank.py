@@ -10,7 +10,7 @@ print('Testing multi-bank question selection:')
 print(f'  Room question banks: {room["question_banks"]}')
 print(f'  Combined pool size: {len(combined)} questions')
 assert 'spicy' in room['question_banks'] and 'general' in room['question_banks']
-assert len(combined) == 128 + 70
+assert len(combined) == 193 + 135
 print('✓ Multi-bank selection working correctly')
 
 # Test with single bank
@@ -19,7 +19,7 @@ response = client.post('/create', data={'name': 'Host2', 'question_banks': ['cla
 room2 = next(iter(rooms.values()))
 pool2 = get_questions_from_banks(room2['question_banks'])
 print(f'  Single bank (classic): {len(pool2)} questions')
-assert len(pool2) == 21
+assert len(pool2) == 86
 print('✓ Single-bank fallback working')
 
 # Test with default (no selection)
