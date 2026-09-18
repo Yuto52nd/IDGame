@@ -18,6 +18,6 @@ def test_build_question_options_includes_correct_answer():
 
     options = build_question_options(pool, 'Who would win a cooking contest?')
 
-    assert len(options) == 10
+    assert len(options) == 5
     assert 'Who would win a cooking contest?' in options
     assert len(set(options)) == len(options)

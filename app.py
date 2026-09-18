@@ -29,7 +29,7 @@ def build_question_options(question_pool, correct_question=None):
         correct_question = question_pool
         question_pool = QUESTIONS
     other_questions = [q for q in question_pool if q != correct_question]
-    options = random.sample(other_questions, 9) if len(other_questions) >= 9 else other_questions[:]
+    options = random.sample(other_questions, 4) if len(other_questions) >= 4 else other_questions[:]
     options.append(correct_question)
     random.shuffle(options)
     return options
@@ -228,7 +228,7 @@ def submit_guess(data):
 def next_round():
     room, name = sid_map[request.sid]
     r = rooms[room]
-    if name != r["host"]:
+    if name != r["host"] or r["state"] != "results":
         return
 
     r["round"] += 1
@@ -255,6 +255,7 @@ def next_round():
             "question": r["question"],
             "players": list(r["players"].keys())
         }, to=ranker_sid)
+    broadcast(room)
 
 
 @socketio.on("disconnect")

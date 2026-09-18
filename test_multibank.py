@@ -1,5 +1,30 @@
+import json
+
 from app import app, rooms
+from app import build_question_options
 from question_store import get_questions_from_banks
+
+
+with open('data/questions.json', encoding='utf-8') as questions_file:
+	question_data = json.load(questions_file)
+
+print('Testing question data:')
+assert question_data['banks']
+assert all(bank['key'] and bank['label'] and bank['questions'] for bank in question_data['banks'])
+print('✓ Question data is valid')
+
+options = build_question_options([
+	'Question 1',
+	'Question 2',
+	'Question 3',
+	'Question 4',
+	'Question 5',
+	'Question 6',
+], 'Question 6')
+assert len(options) == 5
+assert 'Question 6' in options
+assert len(set(options)) == 5
+print('✓ Five-question options working correctly')
 
 client = app.test_client()
 response = client.post('/create', data={'name': 'Host', 'question_banks': ['spicy', 'general']})

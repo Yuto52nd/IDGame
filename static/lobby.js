@@ -256,6 +256,7 @@ socket.on('next_round_started', (data) => {
   gameScreen.classList.remove('hidden');
   gameScreen.classList.add('active-screen');
   resultView.classList.add('hidden');
+  nextRoundBtn.classList.add('hidden');
   questionList.classList.remove('hidden');
 
   if (me === data.ranker) {
